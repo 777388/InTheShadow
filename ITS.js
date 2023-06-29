@@ -1,12 +1,12 @@
-function copyVariablesToShadowRoot(obj, shadowRoot) {
+function copyVariablesToShadowRoot(obj, ShadowRoot) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const value = obj[key];
       if (typeof value === 'object' && value !== null) {
-        const nestedShadowRoot = shadowRoot.attachShadow({ mode: 'open' });
+        const nestedShadowRoot = ShadowRoot.attachShadow({ mode: 'open' });
         copyVariablesToShadowRoot(value, nestedShadowRoot);
       } else {
-        shadowRoot[key] = value;
+        ShadowRoot[key] = value;
       }
     }
   }
@@ -26,7 +26,7 @@ function watchVariableChanges(obj, shadowRoot) {
           currentValue = newValue;
 
           // Update the value in the ShadowRoot
-          shadowRoot[key] = newValue;
+          ShadowRoot[key] = newValue;
         },
         enumerable: true,
         configurable: true,
@@ -34,7 +34,7 @@ function watchVariableChanges(obj, shadowRoot) {
 
       if (typeof currentValue === 'object' && currentValue !== null) {
         const nestedShadowRoot = document.createElement('div');
-        shadowRoot.appendChild(nestedShadowRoot);
+        ShadowRoot.appendChild(nestedShadowRoot);
         watchVariableChanges(currentValue, nestedShadowRoot);
       }
     }
@@ -45,8 +45,8 @@ function inspectDOM() {
   const bodyElement = document.body;
   const shadowRoot = bodyElement.attachShadow({ mode: 'open' });
 
-  copyVariablesToShadowRoot(window, shadowRoot);
-  watchVariableChanges(window, shadowRoot);
+  copyVariablesToShadowRoot(window, ShadowRoot);
+  watchVariableChanges(window, ShadowRoot);
 }
 
 window.addEventListener('DOMContentLoaded', inspectDOM);
