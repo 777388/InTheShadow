@@ -1,12 +1,14 @@
-function copyVariablesToShadowRoot(obj, ShadowRoot) {
+function copyVariablesToShadowRoot(obj, shadowRoot) {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const value = obj[key];
       if (typeof value === 'object' && value !== null) {
-        const nestedShadowRoot = ShadowRoot.attachShadow({ mode: 'open' });
+        const nestedContainer = document.createElement('div');
+        shadowRoot.appendChild(nestedContainer);
+        const nestedShadowRoot = nestedContainer.attachShadow({ mode: 'open' });
         copyVariablesToShadowRoot(value, nestedShadowRoot);
       } else {
-        ShadowRoot[key] = value;
+        shadowRoot[key] = value;
       }
     }
   }
@@ -26,27 +28,28 @@ function watchVariableChanges(obj, shadowRoot) {
           currentValue = newValue;
 
           // Update the value in the ShadowRoot
-          ShadowRoot[key] = newValue;
+          shadowRoot[key] = newValue;
         },
         enumerable: true,
         configurable: true,
       });
 
       if (typeof currentValue === 'object' && currentValue !== null) {
-        const nestedShadowRoot = document.createElement('div');
-        ShadowRoot.appendChild(nestedShadowRoot);
-        watchVariableChanges(currentValue, nestedShadowRoot);
+        const nestedContainer = document.createElement('div');
+        shadowRoot.appendChild(nestedContainer);
+        watchVariableChanges(currentValue, nestedContainer);
       }
     }
   }
 }
 
 function inspectDOM() {
-  const bodyElement = document.body;
-  const shadowRoot = bodyElement.attachShadow({ mode: 'open' });
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const shadowRoot = container.attachShadow({ mode: 'open' });
 
-  copyVariablesToShadowRoot(window, ShadowRoot);
-  watchVariableChanges(window, ShadowRoot);
+  copyVariablesToShadowRoot(window, shadowRoot);
+  watchVariableChanges(window, shadowRoot);
 }
 
 window.addEventListener('DOMContentLoaded', inspectDOM);
