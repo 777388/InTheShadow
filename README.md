@@ -4,3 +4,6 @@ DOM variable theft via ShadowRoot for inspecting variable changes that occur wit
 Will cause a segmentation fault in websites so figure out how to monitor it.
 
 Simply place within your Javascript console and this will inspect all of the variables and steal their training.
+
+be sure to write inspectDOM() into console whenever you want this to run
+
